@@ -20,6 +20,8 @@ import java.util.Set;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.my.splitter.file.OperationResult;
 import com.my.splitter.file.Splitter;
@@ -34,6 +36,7 @@ public class SplitterTest {
 	private static final int SIZE = 100;
 	private static final String TEMPFILE_ORIGIN = "test.txt";
 	private static Splitter splitter = null;
+	private static final Logger log = LoggerFactory.getLogger(SplitterTest.class);
 
 	/**
 	 * @throws java.lang.Exception
@@ -74,6 +77,9 @@ public class SplitterTest {
 		assertTrue(or.isSuccess());
 	}
 	
+	/**
+	 * Test method for private method {@link com.my.splitter.file.Splitter#calculatePartsNumber(int, long)}.
+	 */
 	@Test
 	public void testCalculatePartsNumber() {
 		int result = 0;
@@ -94,20 +100,15 @@ public class SplitterTest {
 			method.setAccessible(true);
 			result = (Integer) method.invoke(splitter, chunkSize, fileSize);
 		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Reflection", e);
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Security", e);
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Access", e);
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Arguments", e);
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Target", e);
 		}
 		return result;
 	}

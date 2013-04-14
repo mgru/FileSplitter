@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Class for breaking file to pieces
  * 
@@ -12,6 +15,9 @@ import java.nio.file.StandardOpenOption;
  * 
  */
 public class Splitter {
+
+	private final static Logger log = LoggerFactory.getLogger(OperationResult.class);
+	
 	private File file;
 
 	public Splitter(File file) {
@@ -31,16 +37,15 @@ public class Splitter {
 					StandardOpenOption.READ);
 			calculatePartsNumber(size, fc.size());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			or.setMessage("Could not open the file");
+			log.error("Could not open file {}", file.toPath(), e);
 		}
 		return or;
 	}
 
-	private int calculatePartsNumber(int chunckSize, long fileSize)
-			throws IOException {
+	private int calculatePartsNumber(int chunckSize, long fileSize) {
 		long parsNum = fileSize / chunckSize;
-		if(fileSize % chunckSize != 0) {
+		if (fileSize % chunckSize != 0) {
 			parsNum += 1;
 		}
 		return (int) parsNum;
