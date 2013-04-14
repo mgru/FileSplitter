@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import com.my.splitter.file.Splitter;
+
 public class Main {
 
 	private JFrame frame;
@@ -71,6 +73,8 @@ public class Main {
 					File file = fc.getSelectedFile();
 					JOptionPane.showMessageDialog(frame,
 							"File: " + file.toPath());
+					new Splitter(file).split(50);
+					
 				}
 			}
 		});

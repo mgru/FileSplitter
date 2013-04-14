@@ -10,6 +10,7 @@ import java.io.BufferedWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -34,7 +35,8 @@ public class SplitterTest {
 
 	private static final int CUNCK_SIZE = 50;
 	private static final int SIZE = 100;
-	private static final String TEMPFILE_ORIGIN = "test.txt";
+	private static final String TEMPFILE_ORIGIN = "tmp\\test.txt";
+	private static final String TEMPFOLDER = "tmp";
 	private static Splitter splitter = null;
 	private static final Logger log = LoggerFactory.getLogger(SplitterTest.class);
 
@@ -43,6 +45,7 @@ public class SplitterTest {
 	 */
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
+		Files.createDirectories(Paths.get(TEMPFOLDER));
 		String encoding = System.getProperty("file.encoding");
 		Charset cs = Charset.forName(encoding);
 		Set<OpenOption> options = new HashSet<OpenOption>();
@@ -64,7 +67,12 @@ public class SplitterTest {
 	 */
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
-		Files.delete(Paths.get(TEMPFILE_ORIGIN));
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(TEMPFOLDER))) {
+		    for (Path file: stream) {
+		    	Files.delete(file);
+		    }
+		}
+		Files.delete(Paths.get(TEMPFOLDER));
 	}
 
 	/**
@@ -92,6 +100,20 @@ public class SplitterTest {
 		
 	}
 
+	/**
+	 * Test method for private method {@link com.my.splitter.file.Splitter#removeExtention(String)}.
+	 */
+	@Test(expected=NullPointerException.class)
+	public void testRemoveExtention() throws Throwable {
+		String s = invoceRemoveExtention("");
+		assertEquals("", s);
+		s = invoceRemoveExtention("mooo.txt");
+		assertEquals("mooo", s);
+		s = invoceRemoveExtention("moo.txt.chm");
+		assertEquals("moo.txt", s);
+		s = invoceRemoveExtention(null);
+	}
+
 	private int invokeCalculatePartsNumber(int chunkSize, long fileSize) {
 		int result = 0;
 		Method method;
@@ -113,4 +135,27 @@ public class SplitterTest {
 		return result;
 	}
 
+	private String invoceRemoveExtention(String str) throws Throwable {
+		String result = null;
+		Method method;
+		try {
+			method = splitter.getClass().getDeclaredMethod("removeExtention", String.class);
+			method.setAccessible(true);
+			result = (String) method.invoke(splitter, str);
+		} catch (NoSuchMethodException e) {
+			log.error("Reflection", e);
+		} catch (SecurityException e) {
+			log.error("Security", e);
+		} catch (IllegalAccessException e) {
+			log.error("Access", e);
+		} catch (IllegalArgumentException e) {
+			log.error("Arguments", e);
+		} catch (InvocationTargetException e) {
+			log.error("Target", e);
+			throw e.getCause();
+		}
+		return result;
+	}
+	
+	
 }
