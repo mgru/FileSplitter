@@ -47,7 +47,7 @@ public class Splitter {
 		
 		// process file
 		try (FileChannel fc = FileChannel.open(path, StandardOpenOption.READ)) {
-			processFile(path, fc, parent, size);
+			return processFile(path, fc, parent, size);
 		} catch (Exception e) {
 			or.setMessage("File splitting error");
 			log.error("File splitting error for {}", path, e);
