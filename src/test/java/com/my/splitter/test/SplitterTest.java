@@ -76,7 +76,7 @@ public class SplitterTest {
 	}
 
 	/**
-	 * Test method for {@link com.my.splitter.file.Splitter#split(int)}.
+	 * Test method for {@link com.my.splitter.file.Splitter#split(long)}.
 	 */
 	@Test
 	public void testSplit() {
@@ -86,7 +86,7 @@ public class SplitterTest {
 	}
 	
 	/**
-	 * Test method for private method {@link com.my.splitter.file.Splitter#calculatePartsNumber(int, long)}.
+	 * Test method for private method {@link com.my.splitter.file.Splitter#calculatePartsNumber(long, long)}.
 	 */
 	@Test
 	public void testCalculatePartsNumber() {
@@ -118,7 +118,7 @@ public class SplitterTest {
 		int result = 0;
 		Method method;
 		try {
-			method = splitter.getClass().getDeclaredMethod("calculatePartsNumber", int.class, long.class);
+			method = splitter.getClass().getDeclaredMethod("calculatePartsNumber", long.class, long.class);
 			method.setAccessible(true);
 			result = (Integer) method.invoke(splitter, chunkSize, fileSize);
 		} catch (NoSuchMethodException e) {

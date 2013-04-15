@@ -37,7 +37,7 @@ public class Splitter {
 	 * @param size
 	 *            - the size of the parts in byte
 	 */
-	public OperationResult split(int size) {
+	public OperationResult split(long size) {
 		
 		// initialize
 		OperationResult or = new OperationResult(false);
@@ -55,7 +55,7 @@ public class Splitter {
 		return or;
 	}
 
-	private OperationResult processFile(Path path, FileChannel fc, Path parent, int size) {
+	private OperationResult processFile(Path path, FileChannel fc, Path parent, long size) {
 		String name = removeExtention(path.getFileName().toString());
 		int i = 0;
 		try {
@@ -90,7 +90,7 @@ public class Splitter {
 	}
 	
 	//Under test in JUnit
-	private int calculatePartsNumber(int chunckSize, long fileSize) {
+	private int calculatePartsNumber(long chunckSize, long fileSize) {
 		long parsNum = fileSize / chunckSize;
 		if (fileSize % chunckSize != 0) {
 			parsNum += 1;
