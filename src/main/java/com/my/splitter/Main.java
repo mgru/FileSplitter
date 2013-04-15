@@ -4,6 +4,8 @@ import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 
 import javax.swing.JButton;
@@ -14,12 +16,17 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.my.splitter.file.Splitter;
+import javax.swing.JToolBar;
+import javax.swing.border.EtchedBorder;
+import javax.swing.JToggleButton;
 
 public class Main {
 
 	private JFrame frame;
 	private JTextField textField;
 	private final JFileChooser fc = new JFileChooser();
+	private final JToggleButton tglbtnSplit = new JToggleButton("Split");
+	private final JToggleButton tglbtnStich = new JToggleButton("Stich");
 
 	/**
 	 * Launch the application.
@@ -51,7 +58,7 @@ public class Main {
 
 		frame = new JFrame();
 		frame.setResizable(false);
-		frame.setBounds(100, 100, 450, 300);
+		frame.setBounds(100, 100, 571, 338);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Container contentPane = frame.getContentPane();
 		contentPane.setLayout(null);
@@ -61,7 +68,7 @@ public class Main {
 		contentPane.add(panel);
 
 		textField = new JTextField();
-		textField.setBounds(10, 11, 318, 20);
+		textField.setBounds(10, 28, 446, 20);
 		contentPane.add(textField);
 		textField.setColumns(10);
 
@@ -78,7 +85,44 @@ public class Main {
 				}
 			}
 		});
-		btnBrowse.setBounds(338, 10, 89, 23);
+		btnBrowse.setBounds(466, 27, 89, 23);
 		contentPane.add(btnBrowse);
+		
+		JPanel fileInfoPanel = new JPanel();
+		fileInfoPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		fileInfoPanel.setBounds(10, 54, 545, 245);
+		frame.getContentPane().add(fileInfoPanel);
+		fileInfoPanel.setLayout(null);
+		
+		JButton splitButton = new JButton("Split");
+		splitButton.setBounds(462, 211, 73, 23);
+		fileInfoPanel.add(splitButton);
+		
+		JToolBar toolBar = new JToolBar();
+		toolBar.setFloatable(false);
+		toolBar.setBounds(10, 1, 545, 23);
+		frame.getContentPane().add(toolBar);
+		
+		tglbtnSplit.setSelected(true);
+		tglbtnSplit.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					tglbtnStich.setSelected(false);
+				}
+			}
+		});
+		toolBar.add(tglbtnSplit);
+		
+		tglbtnStich.setSelected(false);
+		tglbtnStich.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					tglbtnSplit.setSelected(false);
+				}
+			}
+		});
+		toolBar.add(tglbtnStich);
 	}
 }
