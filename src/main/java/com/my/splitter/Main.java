@@ -14,11 +14,11 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
-import com.my.splitter.file.Splitter;
+import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
-import javax.swing.JToggleButton;
+
+import com.my.splitter.file.Splitter;
 
 public class Main {
 
@@ -60,16 +60,27 @@ public class Main {
 		frame.setResizable(false);
 		frame.setBounds(100, 100, 571, 338);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		Container contentPane = frame.getContentPane();
+		final Container contentPane = frame.getContentPane();
 		contentPane.setLayout(null);
 
+		// Tool bar
+		JToolBar toolBar = new JToolBar();
+		toolBar.setFloatable(false);
+		toolBar.setBounds(10, 1, 545, 23);
+		frame.getContentPane().add(toolBar);
+		
+		final JPanel mainPanel = new JPanel();
+		mainPanel.setBounds(10, 26, 545, 273);
+		contentPane.add(mainPanel);
+
+		
 		JPanel panel = new JPanel();
 		panel.setBounds(43, 90, 10, 10);
-		contentPane.add(panel);
+		mainPanel.setLayout(null);
 
 		textField = new JTextField();
-		textField.setBounds(10, 28, 446, 20);
-		contentPane.add(textField);
+		textField.setBounds(10, 6, 425, 20);
+		mainPanel.add(textField);
 		textField.setColumns(10);
 
 		JButton btnBrowse = new JButton("Browse");
@@ -85,23 +96,18 @@ public class Main {
 				}
 			}
 		});
-		btnBrowse.setBounds(466, 27, 89, 23);
-		contentPane.add(btnBrowse);
+		btnBrowse.setBounds(445, 5, 90, 23);
+		mainPanel.add(btnBrowse);
 		
 		JPanel fileInfoPanel = new JPanel();
 		fileInfoPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		fileInfoPanel.setBounds(10, 54, 545, 245);
-		frame.getContentPane().add(fileInfoPanel);
+		fileInfoPanel.setBounds(10, 37, 525, 225);
 		fileInfoPanel.setLayout(null);
-		
 		JButton splitButton = new JButton("Split");
-		splitButton.setBounds(462, 211, 73, 23);
+		splitButton.setBounds(452, 191, 63, 23);
 		fileInfoPanel.add(splitButton);
+		mainPanel.add(fileInfoPanel);
 		
-		JToolBar toolBar = new JToolBar();
-		toolBar.setFloatable(false);
-		toolBar.setBounds(10, 1, 545, 23);
-		frame.getContentPane().add(toolBar);
 		
 		tglbtnSplit.setSelected(true);
 		tglbtnSplit.addItemListener(new ItemListener() {
@@ -120,6 +126,7 @@ public class Main {
 			public void itemStateChanged(ItemEvent e) {
 				if(e.getStateChange() == ItemEvent.SELECTED) {
 					tglbtnSplit.setSelected(false);
+					contentPane.remove(mainPanel);
 				}
 			}
 		});
