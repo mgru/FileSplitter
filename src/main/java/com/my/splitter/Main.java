@@ -7,13 +7,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.nio.file.Paths;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
@@ -21,8 +22,9 @@ import javax.swing.JToolBar;
 import javax.swing.border.EtchedBorder;
 
 import com.my.splitter.file.Splitter;
+import com.my.splitter.file.notify.TextAreaLogger;
 import com.my.splitter.model.SplitPanelModel;
-import javax.swing.JSpinner;
+import java.awt.Color;
 
 public class Main {
 
@@ -37,6 +39,9 @@ public class Main {
 	private final JLabel lblSize = new JLabel();
 	private final JSpinner spinner = new JSpinner();
 	private final JLabel lblSplitSize = new JLabel("Split size");
+	private final JTextArea textArea = new JTextArea();
+	private final JScrollPane scrollPane = new JScrollPane(textArea);
+	private final TextAreaLogger taLogger = new TextAreaLogger(textArea, scrollPane);
 
 	private final SplitPanelModel splitPaneelModel = new SplitPanelModel("Folder: ", "File: ", "Size: ");
 
@@ -102,7 +107,6 @@ public class Main {
 				int result = fc.showDialog(frame, "Pick up the file to split");
 				if (result == JFileChooser.APPROVE_OPTION) {
 					splitSelectUpdate(fc.getSelectedFile());
-//					new Splitter(file).split(50);
 				}
 			}
 		});
@@ -115,7 +119,7 @@ public class Main {
 		fileInfoPanel.setLayout(null);
 		splitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new Splitter(splitPaneelModel.getFile()).split((Long)spinner.getValue());
+				new Splitter(splitPaneelModel.getFile(), taLogger).split(Long.parseLong(((JSpinner.NumberEditor)spinner.getEditor()).getTextField().getText()));
 			}
 		});
 		splitButton.setEnabled(false);
@@ -134,19 +138,24 @@ public class Main {
 		lblSize.setBounds(10, 61, 180, 14);
 		lblSize.setVisible(false);
 		fileInfoPanel.add(lblSize);
+		textArea.setWrapStyleWord(true);
+		textArea.setEditable(false);
+		textArea.setForeground(Color.BLACK);
 		
-		JTextArea textArea = new JTextArea();
 		textArea.setVisible(false);
 		textArea.setEnabled(false);
-		textArea.setEditable(false);
 		textArea.setBounds(10, 93, 429, 121);
-		fileInfoPanel.add(textArea);
+		scrollPane.setVisible(false);
+		
+		scrollPane.setBounds(10, 93, 429, 121);
+		fileInfoPanel.add(scrollPane);
 		
 		lblSplitSize.setBounds(300, 61, 63, 14);
 		lblSplitSize.setVisible(false);
 		fileInfoPanel.add(lblSplitSize);
 		
 		spinner.setBounds(373, 61, 100, 20);
+		spinner.setEditor(new JSpinner.NumberEditor(spinner));
 		spinner.setVisible(false);
 		fileInfoPanel.add(spinner);
 		
@@ -180,6 +189,9 @@ public class Main {
 	}
 	
 	private void splitPanelReset() {
+		textArea.setText("");
+		textArea.setVisible(false);
+		scrollPane.setVisible(false);
 		splitButton.setEnabled(false);
 		lblFolder.setText(splitPaneelModel.getFolderLabel());
 		lblFile.setText(splitPaneelModel.getFileLabel());

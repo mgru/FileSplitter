@@ -12,6 +12,10 @@ import java.util.EnumSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.my.splitter.file.notify.Dummy;
+import com.my.splitter.file.notify.Information;
+import com.my.splitter.file.notify.Notifier;
+
 /**
  * Class for breaking file to pieces
  * 
@@ -26,9 +30,16 @@ public class Splitter {
 	private final static Logger log = LoggerFactory.getLogger(OperationResult.class);
 	
 	private File file;
+	
+	private Notifier notifier = new Dummy();
 
 	public Splitter(File file) {
 		this.file = file;
+	}
+
+	public Splitter(File file, Notifier notifier) {
+		this.file = file;
+		this.notifier = notifier;
 	}
 
 	/**
@@ -61,9 +72,12 @@ public class Splitter {
 		try {
 			int parts = calculatePartsNumber(size, fc.size());
 			for (i = 0; i < parts; i++) {
-				try (FileChannel pfc = FileChannel.open(parent.resolve(generateName(name, i)), CREATE_NEW_FILE_OPTIONS)) {
+				Path chunk = parent.resolve(generateName(name, i));
+				try (FileChannel pfc = FileChannel.open(chunk, CREATE_NEW_FILE_OPTIONS)) {
 					fc.transferTo(size*i, size, pfc);
+					Information info = new Information(chunk.getFileName().toString(), pfc.size(), (int) Math.floor((double) i / (double)parts));
 					pfc.close();
+					notifier.informProgress(info);
 				}
 			}
 		} catch (FileAlreadyExistsException e) {
