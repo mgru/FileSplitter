@@ -15,7 +15,9 @@ import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.AfterClass;
@@ -26,6 +28,7 @@ import org.slf4j.Logger;
 
 import com.my.splitter.file.OperationResult;
 import com.my.splitter.file.Splitter;
+import com.my.splitter.file.notify.Information;
 
 /**
  * @author mike
@@ -36,9 +39,19 @@ public class SplitterTest {
 	private static final int CUNCK_SIZE = 50;
 	private static final int SIZE = 100;
 	private static final String TEMPFILE_ORIGIN = "tmp\\test.txt";
+	private static final String TEMPFILE_RESULT = "result.txt";
 	private static final String TEMPFOLDER = "tmp";
 	private static Splitter splitter = null;
 	private static final Logger log = LoggerFactory.getLogger(SplitterTest.class);
+	private static final List<String> chunkList = new ArrayList<>();
+	
+	
+	public static class Informer implements com.my.splitter.file.notify.Notifier {
+		@Override
+		public void informProgress(Information info) {
+			chunkList.add(info.getFilename());
+		}
+	}
 
 	/**
 	 * @throws java.lang.Exception
@@ -59,7 +72,7 @@ public class SplitterTest {
 			}
 			testFile.close();
 		}
-		splitter = new Splitter(path.toFile());
+		splitter = new Splitter(path.toFile(), new SplitterTest.Informer());
 	}
 
 	/**
@@ -113,6 +126,24 @@ public class SplitterTest {
 		assertEquals("moo.txt", s);
 		s = invoceRemoveExtention(null);
 	}
+	
+	@Test
+	public void testStitch() {
+		
+	}
+	
+	@Test
+	public void testSelf() {
+		byte[] one = {1,2,3,4,5};
+		byte[] two = {1,2,3,4,5};
+		byte[] three = {1,2,3,4,6};
+		byte[] four = {1,2,3,4,5,6};
+
+		assertTrue(binaryCompare(one, one));
+		assertTrue(binaryCompare(one, two));
+		assertFalse(binaryCompare(one, three));
+		assertFalse(binaryCompare(one, four));
+	}
 
 	private int invokeCalculatePartsNumber(int chunkSize, long fileSize) {
 		int result = 0;
@@ -155,6 +186,19 @@ public class SplitterTest {
 			throw e.getCause();
 		}
 		return result;
+	}
+	
+	private boolean binaryCompare(byte[] one, byte[] two) {
+		if(one == two ) { return true;}
+		if(one.length == two.length) {
+			for(int i = 0, n = one.length; i < n; i++) {
+				if(one[i] != two[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	

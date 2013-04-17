@@ -32,7 +32,7 @@ public class Main {
 	private JTextField textField;
 	private final JFileChooser fc = new JFileChooser();
 	private final JToggleButton tglbtnSplit = new JToggleButton("Split");
-	private final JToggleButton tglbtnStich = new JToggleButton("Stich");
+	private final JToggleButton tglbtnStitch = new JToggleButton("Stitch");
 	private final JButton splitButton = new JButton("Split");
 	private final JLabel lblFolder = new JLabel();
 	private final JLabel lblFile = new JLabel();
@@ -165,7 +165,7 @@ public class Main {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if(e.getStateChange() == ItemEvent.SELECTED) {
-					tglbtnStich.setSelected(false);
+					tglbtnStitch.setSelected(false);
 					addPanel(contentPane, mainPanel);
 
 				}
@@ -174,8 +174,8 @@ public class Main {
 		});
 		toolBar.add(tglbtnSplit);
 		
-		tglbtnStich.setSelected(false);
-		tglbtnStich.addItemListener(new ItemListener() {
+		tglbtnStitch.setSelected(false);
+		tglbtnStitch.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if(e.getStateChange() == ItemEvent.SELECTED) {
@@ -185,7 +185,7 @@ public class Main {
 			}
 
 		});
-		toolBar.add(tglbtnStich);
+		toolBar.add(tglbtnStitch);
 	}
 	
 	private void splitPanelReset() {
