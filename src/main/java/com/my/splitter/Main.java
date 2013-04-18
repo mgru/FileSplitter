@@ -24,6 +24,8 @@ import javax.swing.border.EtchedBorder;
 import com.my.splitter.file.Splitter;
 import com.my.splitter.file.notify.TextAreaLogger;
 import com.my.splitter.model.SplitPanelModel;
+import com.my.splitter.swing.StitchPanel;
+
 import java.awt.Color;
 
 public class Main {
@@ -44,6 +46,8 @@ public class Main {
 	private final TextAreaLogger taLogger = new TextAreaLogger(textArea, scrollPane);
 
 	private final SplitPanelModel splitPaneelModel = new SplitPanelModel("Folder: ", "File: ", "Size: ");
+	
+	private final StitchPanel stitchPanel = new StitchPanel();
 
 	/**
 	 * Launch the application.
@@ -166,6 +170,7 @@ public class Main {
 			public void itemStateChanged(ItemEvent e) {
 				if(e.getStateChange() == ItemEvent.SELECTED) {
 					tglbtnStitch.setSelected(false);
+					removePanel(contentPane, stitchPanel);
 					addPanel(contentPane, mainPanel);
 
 				}
@@ -181,6 +186,7 @@ public class Main {
 				if(e.getStateChange() == ItemEvent.SELECTED) {
 					tglbtnSplit.setSelected(false);
 					removePanel(contentPane, mainPanel);
+					addPanel(contentPane, stitchPanel);
 				}
 			}
 
