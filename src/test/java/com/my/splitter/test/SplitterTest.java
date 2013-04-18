@@ -3,10 +3,14 @@
  */
 package com.my.splitter.test;
 
-import static java.nio.file.StandardOpenOption.*;
-import static org.junit.Assert.*;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
@@ -23,11 +27,13 @@ import java.util.Set;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.my.splitter.file.OperationResult;
 import com.my.splitter.file.Splitter;
+import com.my.splitter.file.Stitcher;
+import com.my.splitter.file.notify.Dummy;
 import com.my.splitter.file.notify.Information;
 
 /**
@@ -43,13 +49,13 @@ public class SplitterTest {
 	private static final String TEMPFOLDER = "tmp";
 	private static Splitter splitter = null;
 	private static final Logger log = LoggerFactory.getLogger(SplitterTest.class);
-	private static final List<String> chunkList = new ArrayList<>();
+	private static final List<Path> chunkList = new ArrayList<>();
 	
 	
 	public static class Informer implements com.my.splitter.file.notify.Notifier {
 		@Override
 		public void informProgress(Information info) {
-			chunkList.add(info.getFilename());
+			chunkList.add(Paths.get(TEMPFOLDER).resolve(Paths.get(info.getFilename())));
 		}
 	}
 
@@ -93,7 +99,6 @@ public class SplitterTest {
 	 */
 	@Test
 	public void testSplit() {
-		Path path = Paths.get(TEMPFILE_ORIGIN);
 		OperationResult or = splitter.split(CUNCK_SIZE);
 		assertTrue(or.isSuccess());
 	}
@@ -129,7 +134,18 @@ public class SplitterTest {
 	
 	@Test
 	public void testStitch() {
-		
+		assertTrue(!chunkList.isEmpty());
+		Stitcher stitcher = new Stitcher(chunkList, new Dummy(), TEMPFILE_RESULT);
+		stitcher.stitch();
+		Path result = Paths.get(TEMPFOLDER).resolve(Paths.get(TEMPFILE_RESULT));
+		try {
+			byte[] origin = Files.readAllBytes(Paths.get(TEMPFILE_ORIGIN));
+			byte[] stitched = Files.readAllBytes(result);
+			assertTrue(binaryCompare(origin, stitched));
+		} catch (IOException e) {
+			log.error("Test stitch exception", e);
+			assertTrue(false);
+		}
 	}
 	
 	@Test

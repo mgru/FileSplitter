@@ -27,28 +27,28 @@ public class Stitcher {
 
 	private static final EnumSet<StandardOpenOption> READ_FILE_OPTIONS = EnumSet.of(StandardOpenOption.READ);
 	
-	private List <File> list;
+	private List <Path> list;
 	
 	private Notifier informer;
 	
 	private String resultingName;
 
-	public Stitcher(List<File> list, Notifier informer) {
+	public Stitcher(List<Path> list, Notifier informer) {
 		this.list = list;
 		this.informer = informer;
 		this.resultingName = RESULTING_NAME;
 	}
 
-	public Stitcher(List<File> list) {
+	public Stitcher(List<Path> list) {
 		this.list = list;
 		this.informer  = new Dummy();
 		this.resultingName = RESULTING_NAME;
 	}
 
 	
-	public Stitcher(List<File> list, Notifier informer, String resultingName) {
+	public Stitcher(List<Path> chunklist, Notifier informer, String resultingName) {
 		super();
-		this.list = list;
+		this.list = chunklist;
 		this.informer = informer;
 		this.resultingName = resultingName;
 	}
@@ -58,7 +58,7 @@ public class Stitcher {
 			throw new IllegalArgumentException("File list is empty");
 		}
 		OperationResult or = new OperationResult(false);
-		Path workingFolder = list.get(0).toPath().getParent();
+		Path workingFolder = list.get(0).toAbsolutePath().getParent();
 		if(workingFolder == null) { workingFolder = Paths.get(".\\"); }
 		Path result = workingFolder.resolve(resultingName);
 		try (FileChannel fc = FileChannel.open(result, CREATE_NEW_FILE_OPTIONS)) {
@@ -73,14 +73,13 @@ public class Stitcher {
 
 	private void stitchFiles(FileChannel fc) {
 		for(int i = 0, n = list.size(); i < n; i++) {
-			File file = list.get(i);
-			Path pathOfPart = file.toPath();
-			try(FileChannel pfc = FileChannel.open(pathOfPart, READ_FILE_OPTIONS)) {
+			Path path = list.get(i);
+			try(FileChannel pfc = FileChannel.open(path, READ_FILE_OPTIONS)) {
 				pfc.transferTo(0, pfc.size(), fc);
-				informer.informProgress(new Information(pathOfPart.toString(), pfc.size(), (int) Math.floor((double)i / (double)list.size())));
+				informer.informProgress(new Information(path.toString(), pfc.size(), (int) Math.floor((double)i / (double)list.size())));
 				pfc.close();
 			} catch (IOException e) {
-				log.error("Could not process file {}", pathOfPart, e);
+				log.error("Could not process file {}", path, e);
 			}
 		}
 	}
