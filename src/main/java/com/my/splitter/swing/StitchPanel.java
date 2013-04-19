@@ -1,31 +1,42 @@
 package com.my.splitter.swing;
 
-import javax.swing.AbstractListModel;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.ListModel;
-import javax.swing.border.EtchedBorder;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
-
-import com.my.splitter.file.FileUtils;
-import com.my.splitter.swing.model.FileListModel;
-
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.border.EtchedBorder;
+
+import com.my.splitter.file.FileUtils;
+import com.my.splitter.swing.model.PathObject;
+
+
+/**
+ * Stitcher GUI panel
+ * @author mgruzman
+ *
+ */
+@SuppressWarnings("serial")
 public class StitchPanel extends JPanel {
 	private JTextField textField;
 	private final JFileChooser fc = new JFileChooser();
-	FileListModel listModel = new FileListModel();
+	private final DefaultListModel<PathObject> listModel = new DefaultListModel<PathObject>();
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private final JList fileList = new JList(listModel);
+	private final JButton btnClear = new JButton("Clear");
+	private final JButton removeBtn = new JButton("Remove");
+	private final JButton btnStitch = new JButton("Stitch");
 	
+
 
 	/**
 	 * Create the panel.
@@ -42,7 +53,7 @@ public class StitchPanel extends JPanel {
 		JButton button = new JButton("Browse");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(fc.showDialog(StitchPanel.this, "Pick up base file") == JFileChooser.APPROVE_OPTION) {
+				if(fc.showDialog(StitchPanel.this, "Select") == JFileChooser.APPROVE_OPTION) {
 					populateFileList(fc.getSelectedFile());
 				}
 			}
@@ -60,26 +71,50 @@ public class StitchPanel extends JPanel {
 		scrollPane.setBounds(10, 36, 200, 178);
 		fileInfoPanel.add(scrollPane);
 		
+		listModel.addListDataListener(new ChunckListListener(listModel, btnClear, btnStitch));
+		fileList.addListSelectionListener(new FileListSelectionListener(removeBtn));
 		scrollPane.setViewportView(fileList);
 		
 		JLabel lblPartsList = new JLabel("Parts list");
 		lblPartsList.setBounds(28, 11, 65, 14);
 		fileInfoPanel.add(lblPartsList);
 		
-		JButton btnStitch = new JButton("Stitch");
+		btnStitch.setEnabled(false);
 		btnStitch.setBounds(426, 191, 89, 23);
 		fileInfoPanel.add(btnStitch);
 		
 		JButton btnAdd = new JButton("Add");
+		btnAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if(fc.showDialog(StitchPanel.this, "Add") == JFileChooser.APPROVE_OPTION) {
+					int index = fileList.getSelectedIndex();
+					if(index < 0) { index = 0; } else { index += 1; }
+					listModel.insertElementAt(new PathObject(fc.getSelectedFile().toPath()), index);
+				}
+			}
+		});
 		btnAdd.setBounds(220, 36, 89, 23);
 		fileInfoPanel.add(btnAdd);
 		
-		JButton button_1 = new JButton("Remove");
-		button_1.setBounds(220, 70, 89, 23);
-		fileInfoPanel.add(button_1);
+		removeBtn.setEnabled(false);
+		removeBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = fileList.getSelectedIndex();
+				if(index >= 0) {
+					listModel.removeElementAt(index);
+				}
+			}
+		});
+		removeBtn.setBounds(220, 70, 89, 23);
+		fileInfoPanel.add(removeBtn);
 		
-		JButton btnClear = new JButton("Clear");
+		btnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				listModel.clear();
+			}
+		});
 		btnClear.setBounds(220, 104, 89, 23);
+		btnClear.setEnabled(false);
 		fileInfoPanel.add(btnClear);
 		
 
@@ -88,6 +123,8 @@ public class StitchPanel extends JPanel {
 
 	private void populateFileList(File selectedFile) {
 		List<Path> list = FileUtils.guessFileList(selectedFile.toPath());
-		listModel.setList(list);
+		for(Path p : list) {
+			listModel.insertElementAt(new PathObject(p), listModel.getSize()); 
+		}
 	}
 }
