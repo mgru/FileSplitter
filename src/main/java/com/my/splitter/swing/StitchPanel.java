@@ -88,7 +88,7 @@ public class StitchPanel extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				if(fc.showDialog(StitchPanel.this, "Add") == JFileChooser.APPROVE_OPTION) {
 					int index = fileList.getSelectedIndex();
-					if(index < 0) { index = 0; } else { index += 1; }
+					if(index < 0) { index = listModel.getSize(); } else { index += 1; }
 					listModel.insertElementAt(new PathObject(fc.getSelectedFile().toPath()), index);
 				}
 			}
