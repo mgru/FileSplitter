@@ -83,13 +83,28 @@ public class FileUtils {
 	}
 
 	private static void specialOrder(ArrayList<Path> list) {
-		// TODO implement
 		 Collections.sort(list, new Comparator<Path>() {
 
 				@Override
 				public int compare(Path o1, Path o2) {
-					// TODO Auto-generated method stub
-					return 0;
+					return compareSuffix(o1,o2);
+				}
+
+				private int compareSuffix(Path o1, Path o2) {
+					int i1 = pathToInt(o1);
+					int i2 = pathToInt(o2);
+					return i1 == i2 ? 0 : i1 > i2 ? 1 : -1;
+				}
+
+				private int pathToInt(Path path) {
+					String name = getNameWithoutExt(path);
+					Pattern pattern = Pattern.compile(SUFFIX_PATTERN);
+					Matcher matcher = pattern.matcher(name);
+					if(!matcher.find()) {
+						throw new IllegalArgumentException();
+					}
+					String str = matcher.group().substring(1);
+					return Integer.parseInt(str);
 				}});
 	}
 
