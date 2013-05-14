@@ -54,7 +54,9 @@ public class StitchPanel extends JPanel {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(fc.showDialog(StitchPanel.this, "Select") == JFileChooser.APPROVE_OPTION) {
-					populateFileList(fc.getSelectedFile());
+					File selectedFile = fc.getSelectedFile();
+					textField.setText(selectedFile.getPath());
+					populateFileList(selectedFile);
 				}
 			}
 		});
@@ -102,6 +104,7 @@ public class StitchPanel extends JPanel {
 				int index = fileList.getSelectedIndex();
 				if(index >= 0) {
 					listModel.removeElementAt(index);
+					resetPanel();
 				}
 			}
 		});
@@ -110,6 +113,7 @@ public class StitchPanel extends JPanel {
 		
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				resetPanel();
 				listModel.clear();
 			}
 		});
@@ -121,8 +125,14 @@ public class StitchPanel extends JPanel {
 	}
 
 
+	private void resetPanel() {
+		textField.setText("");
+	}
+
+
 	private void populateFileList(File selectedFile) {
 		List<Path> list = FileUtils.guessFileList(selectedFile.toPath());
+		listModel.clear();
 		for(Path p : list) {
 			listModel.insertElementAt(new PathObject(p), listModel.getSize()); 
 		}

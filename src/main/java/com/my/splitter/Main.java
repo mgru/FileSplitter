@@ -110,7 +110,9 @@ public class Main {
 				splitPanelReset();
 				int result = fc.showDialog(frame, "Pick up the file to split");
 				if (result == JFileChooser.APPROVE_OPTION) {
-					splitSelectUpdate(fc.getSelectedFile());
+					File selectedFile = fc.getSelectedFile();
+					textField.setText(selectedFile.getPath());
+					splitSelectUpdate(selectedFile);
 				}
 			}
 		});
