@@ -123,13 +123,13 @@ public class SplitterTest {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void testRemoveExtention() throws Throwable {
-		String s = invoceRemoveExtention("");
+		String s = invokeRemoveExtention("");
 		assertEquals("", s);
-		s = invoceRemoveExtention("mooo.txt");
+		s = invokeRemoveExtention("mooo.txt");
 		assertEquals("mooo", s);
-		s = invoceRemoveExtention("moo.txt.chm");
+		s = invokeRemoveExtention("moo.txt.chm");
 		assertEquals("moo.txt", s);
-		s = invoceRemoveExtention(null);
+		s = invokeRemoveExtention(null);
 	}
 	
 	@Test
@@ -182,7 +182,7 @@ public class SplitterTest {
 		return result;
 	}
 
-	private String invoceRemoveExtention(String str) throws Throwable {
+	private String invokeRemoveExtention(String str) throws Throwable {
 		String result = null;
 		Method method;
 		try {
