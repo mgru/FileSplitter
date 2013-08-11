@@ -46,7 +46,6 @@ public class Stitcher {
 
 	
 	public Stitcher(List<Path> chunklist, Notifier informer, String resultingName) {
-		super();
 		this.list = chunklist;
 		this.informer = informer;
 		this.resultingName = resultingName;
