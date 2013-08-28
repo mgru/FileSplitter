@@ -125,7 +125,7 @@ public class Main {
 		fileInfoPanel.setLayout(null);
 		splitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new Splitter(splitPaneelModel.getFile(), taLogger).split(Long.parseLong(((JSpinner.NumberEditor)spinner.getEditor()).getTextField().getText()));
+				new Splitter(splitPaneelModel.getFile(), taLogger).split((Long)spinner.getModel().getValue());
 			}
 		});
 		splitButton.setEnabled(false);

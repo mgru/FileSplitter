@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -17,6 +19,8 @@ import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
 import com.my.splitter.file.FileUtils;
+import com.my.splitter.file.Stitcher;
+import com.my.splitter.file.notify.Dummy;
 import com.my.splitter.swing.model.PathObject;
 
 
@@ -80,6 +84,11 @@ public class StitchPanel extends JPanel {
 		JLabel lblPartsList = new JLabel("Parts list");
 		lblPartsList.setBounds(28, 11, 65, 14);
 		fileInfoPanel.add(lblPartsList);
+		btnStitch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				stitchFiles();
+			}
+		});
 		
 		btnStitch.setEnabled(false);
 		btnStitch.setBounds(426, 191, 89, 23);
@@ -122,6 +131,16 @@ public class StitchPanel extends JPanel {
 		fileInfoPanel.add(btnClear);
 		
 
+	}
+
+
+	protected void stitchFiles() {
+		List<Path> list = new ArrayList<>();
+		for(Object o: listModel.toArray()) {
+			list.add(((PathObject) o).getPath());
+		}
+		Stitcher stitcher = new Stitcher(list, new Dummy(), "bulkfile");
+		stitcher.stitch();
 	}
 
 
