@@ -79,6 +79,7 @@ public class Splitter {
 					pfc.close();
 					notifier.informProgress(info);
 				}
+		// 		sleepASecond(); // test
 			}
 		} catch (FileAlreadyExistsException e) {
 			log.warn("Could not create file", e);
@@ -88,6 +89,16 @@ public class Splitter {
 			return new OperationResult(false, "Failed to create part " + i);
 		}
 		return new OperationResult(true);
+	}
+	
+	// test purposes only
+	@SuppressWarnings("unused")
+	private void sleepASecond() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private String generateName(String nameBase, int index) {

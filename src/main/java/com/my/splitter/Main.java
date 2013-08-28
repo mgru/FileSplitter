@@ -19,6 +19,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
 import com.my.splitter.file.Splitter;
@@ -43,7 +44,6 @@ public class Main {
 	private final JLabel lblSplitSize = new JLabel("Split size");
 	private final JTextArea textArea = new JTextArea();
 	private final JScrollPane scrollPane = new JScrollPane(textArea);
-	private final TextAreaLogger taLogger = new TextAreaLogger(textArea, scrollPane);
 
 	private final SplitPanelModel splitPaneelModel = new SplitPanelModel("Folder: ", "File: ", "Size: ");
 	
@@ -125,7 +125,8 @@ public class Main {
 		fileInfoPanel.setLayout(null);
 		splitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new Splitter(splitPaneelModel.getFile(), taLogger).split((Long)spinner.getModel().getValue());
+				splitButton.setEnabled(false);
+				splitInBackground();
 			}
 		});
 		splitButton.setEnabled(false);
@@ -236,4 +237,25 @@ public class Main {
 		container.revalidate();
 		container.repaint();
 	}
+	
+	private void splitInBackground() {
+		SwingWorker<Void, Void> task = new SwingWorker<Void, Void>(){
+
+			@Override
+			protected Void doInBackground() throws Exception {
+				final TextAreaLogger taLogger = new TextAreaLogger(textArea, scrollPane);
+				Object value = spinner.getModel().getValue();
+				Long splitSize = null;
+				if(value instanceof Integer) {
+					splitSize = new Long((Integer) value);
+				} else {
+					splitSize = (Long) value;
+				}
+				new Splitter(splitPaneelModel.getFile(), taLogger).split(splitSize);
+				splitButton.setEnabled(true);
+				return null;
+			}};
+		task.execute();
+	}
+
 }
