@@ -62,6 +62,8 @@ public class Stitcher {
 		Path result = workingFolder.resolve(resultingName);
 		try (FileChannel fc = FileChannel.open(result, CREATE_NEW_FILE_OPTIONS)) {
 			stitchFiles(fc);
+			or.setSuccess(true);
+			or.setMessage("Successfully stitched!");
 			fc.close();
 		} catch (FileAlreadyExistsException e) {
 			log.error("Could not create bulk file, file already exists " + resultingName, e);

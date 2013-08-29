@@ -5,7 +5,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -15,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
@@ -23,12 +23,10 @@ import javax.swing.border.EtchedBorder;
 import com.my.splitter.file.FileUtils;
 import com.my.splitter.file.OperationResult;
 import com.my.splitter.file.Stitcher;
-import com.my.splitter.file.notify.Dummy;
 import com.my.splitter.file.notify.Notifier;
 import com.my.splitter.file.notify.ProgressBarAdapter;
 import com.my.splitter.file.notify.StitchInformer;
 import com.my.splitter.swing.model.PathObject;
-import javax.swing.JProgressBar;
 
 
 /**
@@ -38,6 +36,8 @@ import javax.swing.JProgressBar;
  */
 @SuppressWarnings("serial")
 public class StitchPanel extends JPanel {
+	private static final String FILENAME_PATTERN = "^([a-zA-Z0-9\\s\\._-]+)$";
+	private static final String DEFAULTNAME = "bulkfile";
 	private JTextField textField;
 	private final JFileChooser fc = new JFileChooser();
 	private final DefaultListModel<PathObject> listModel = new DefaultListModel<PathObject>();
@@ -47,6 +47,7 @@ public class StitchPanel extends JPanel {
 	private final JButton removeBtn = new JButton("Remove");
 	private final JButton btnStitch = new JButton("Stitch");
 	private final JProgressBar progressBar = new JProgressBar();
+	private JTextField resultingNameText;
 	
 
 
@@ -95,6 +96,11 @@ public class StitchPanel extends JPanel {
 		btnStitch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnStitch.setEnabled(false);
+				if(!validateResultingName()) {
+					JOptionPane.showMessageDialog(getParent(), "Not a valid resulting file name!");
+					btnStitch.setEnabled(true);
+					return;
+				}
 				progressBar.setVisible(true);
 				stitchFiles();
 			}
@@ -144,7 +150,23 @@ public class StitchPanel extends JPanel {
 		progressBar.setBounds(220, 191, 184, 14);
 		fileInfoPanel.add(progressBar);
 		
+		JLabel resultingFileLabel = new JLabel("Resulting file name");
+		resultingFileLabel.setBounds(240, 160, 108, 14);
+		fileInfoPanel.add(resultingFileLabel);
+		
+		resultingNameText = new JTextField();
+		resultingNameText.setText(DEFAULTNAME);
+		resultingNameText.setBounds(358, 160, 157, 20);
+		fileInfoPanel.add(resultingNameText);
+		resultingNameText.setColumns(10);
+		
 
+	}
+
+
+	protected boolean validateResultingName() {
+		String s = resultingNameText.getText();
+		return s.matches(FILENAME_PATTERN);
 	}
 
 
@@ -159,13 +181,11 @@ public class StitchPanel extends JPanel {
 					list.add(((PathObject) o).getPath());
 				}
 				Notifier stitchInformer = new StitchInformer(new ProgressBarAdapter(progressBar));
-				Stitcher stitcher = new Stitcher(list, stitchInformer , "bulkfile");
+				Stitcher stitcher = new Stitcher(list, stitchInformer , resultingNameText.getText());
 				OperationResult r = stitcher.stitch();
 				btnStitch.setEnabled(true);
 				resetProgressBar();
-				if(!r.isSuccess()) {
-					JOptionPane.showMessageDialog(getParent(), r.getMessage());
-				}
+				JOptionPane.showMessageDialog(getParent(), r.getMessage());
 				return null;
 			}
 		};
