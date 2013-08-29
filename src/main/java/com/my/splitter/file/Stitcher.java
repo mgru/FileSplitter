@@ -74,11 +74,24 @@ public class Stitcher {
 			Path path = list.get(i);
 			try(FileChannel pfc = FileChannel.open(path, READ_FILE_OPTIONS)) {
 				pfc.transferTo(0, pfc.size(), fc);
-				informer.informProgress(new Information(path.toString(), pfc.size(), (int) Math.floor((double)i / (double)list.size())));
+				informer.informProgress(new Information(path.toString(), pfc.size(), (int) Math.floor(100 * (double)i / (double)list.size())));
 				pfc.close();
 			} catch (IOException e) {
 				log.error("Could not process file {}", path, e);
 			}
+			// test
+			// sleepASecond();
 		}
 	}
+	
+	// test purposes only
+	@SuppressWarnings("unused")
+	private void sleepASecond() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

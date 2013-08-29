@@ -16,12 +16,17 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
 import com.my.splitter.file.FileUtils;
 import com.my.splitter.file.Stitcher;
 import com.my.splitter.file.notify.Dummy;
+import com.my.splitter.file.notify.Notifier;
+import com.my.splitter.file.notify.ProgressBarAdapter;
+import com.my.splitter.file.notify.StitchInformer;
 import com.my.splitter.swing.model.PathObject;
+import javax.swing.JProgressBar;
 
 
 /**
@@ -39,6 +44,7 @@ public class StitchPanel extends JPanel {
 	private final JButton btnClear = new JButton("Clear");
 	private final JButton removeBtn = new JButton("Remove");
 	private final JButton btnStitch = new JButton("Stitch");
+	private final JProgressBar progressBar = new JProgressBar();
 	
 
 
@@ -86,6 +92,8 @@ public class StitchPanel extends JPanel {
 		fileInfoPanel.add(lblPartsList);
 		btnStitch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				btnStitch.setEnabled(false);
+				progressBar.setVisible(true);
 				stitchFiles();
 			}
 		});
@@ -130,17 +138,40 @@ public class StitchPanel extends JPanel {
 		btnClear.setEnabled(false);
 		fileInfoPanel.add(btnClear);
 		
+		progressBar.setVisible(false);
+		progressBar.setBounds(220, 191, 184, 14);
+		fileInfoPanel.add(progressBar);
+		
 
 	}
 
 
 	protected void stitchFiles() {
-		List<Path> list = new ArrayList<>();
-		for(Object o: listModel.toArray()) {
-			list.add(((PathObject) o).getPath());
-		}
-		Stitcher stitcher = new Stitcher(list, new Dummy(), "bulkfile");
-		stitcher.stitch();
+		
+		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+			
+			@Override
+			protected Void doInBackground() throws Exception {
+				List<Path> list = new ArrayList<>();
+				for(Object o: listModel.toArray()) {
+					list.add(((PathObject) o).getPath());
+				}
+				Notifier stitchInformer = new StitchInformer(new ProgressBarAdapter(progressBar));
+				Stitcher stitcher = new Stitcher(list, stitchInformer , "bulkfile");
+				stitcher.stitch();
+				btnStitch.setEnabled(true);
+				resetProgressBar();
+				return null;
+			}
+		};
+		worker.execute();
+		
+	}
+
+
+	protected void resetProgressBar() {
+		progressBar.setVisible(false);
+		progressBar.setValue(0);
 	}
 
 
