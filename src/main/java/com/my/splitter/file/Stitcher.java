@@ -2,6 +2,7 @@ package com.my.splitter.file;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -62,22 +63,23 @@ public class Stitcher {
 		try (FileChannel fc = FileChannel.open(result, CREATE_NEW_FILE_OPTIONS)) {
 			stitchFiles(fc);
 			fc.close();
+		} catch (FileAlreadyExistsException e) {
+			log.error("Could not create bulk file, file already exists " + resultingName, e);
+			or.setMessage("Could not create bulk file " + resultingName + ", file alraedy exists");
 		} catch (IOException e) {
 			log.error("Could not create bulk file", e);
-			or.setMessage("Could not create bulk file " + result);
+			or.setMessage("Could not create bulk file " + resultingName);
 		}
 		return or;
 	}
 
-	private void stitchFiles(FileChannel fc) {
+	private void stitchFiles(FileChannel fc) throws IOException {
 		for(int i = 0, n = list.size(); i < n; i++) {
 			Path path = list.get(i);
 			try(FileChannel pfc = FileChannel.open(path, READ_FILE_OPTIONS)) {
 				pfc.transferTo(0, pfc.size(), fc);
 				informer.informProgress(new Information(path.toString(), pfc.size(), (int) Math.floor(100 * (double)i / (double)list.size())));
 				pfc.close();
-			} catch (IOException e) {
-				log.error("Could not process file {}", path, e);
 			}
 			// test
 			// sleepASecond();

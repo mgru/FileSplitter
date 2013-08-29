@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -22,6 +23,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingWorker;
 import javax.swing.border.EtchedBorder;
 
+import com.my.splitter.file.OperationResult;
 import com.my.splitter.file.Splitter;
 import com.my.splitter.file.notify.TextAreaLogger;
 import com.my.splitter.model.SplitPanelModel;
@@ -251,8 +253,12 @@ public class Main {
 				} else {
 					splitSize = (Long) value;
 				}
-				new Splitter(splitPaneelModel.getFile(), taLogger).split(splitSize);
+				Splitter splitter = new Splitter(splitPaneelModel.getFile(), taLogger);
+				OperationResult r = splitter.split(splitSize);
 				splitButton.setEnabled(true);
+				if(!r.isSuccess()) {
+					JOptionPane.showMessageDialog(frame, r.getMessage());
+				}
 				return null;
 			}};
 		task.execute();

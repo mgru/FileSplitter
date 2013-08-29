@@ -83,10 +83,10 @@ public class Splitter {
 			}
 		} catch (FileAlreadyExistsException e) {
 			log.warn("Could not create file", e);
-			return new OperationResult(false, "Could not create a file chunk name" + i + ", file with such name already exists");
+			return new OperationResult(false, "Could not create a file chunk " + name + "0" + (i + 1) + ", file with such name already exists");
 		} catch (IOException e) {
 			log.error("Could not create part {}", i, e);
-			return new OperationResult(false, "Failed to create part " + i);
+			return new OperationResult(false, "Failed to create part 0" + (i + 1));
 		}
 		return new OperationResult(true);
 	}
